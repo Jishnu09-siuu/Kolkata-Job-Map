@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Sparkles,
   Layers,
-  Filter
+  Filter,
+  Plus
 } from 'lucide-react';
 import { JobListing, Company } from '@/types';
 
@@ -36,7 +37,8 @@ export const CompanyList: React.FC = () => {
     isJobSaved,
     userLocation,
     commuteMode,
-    getCommuteForLocation
+    getCommuteForLocation,
+    setIsAdminModalOpen
   } = useApp();
 
   const [viewMode, setViewMode] = useState<'companies' | 'all_jobs'>('companies');
@@ -118,9 +120,16 @@ export const CompanyList: React.FC = () => {
                 <Search className="w-6 h-6" />
               </div>
               <h3 className="text-sm font-semibold text-zinc-800 mb-1">No matching companies</h3>
-              <p className="text-xs text-zinc-500 max-w-xs mx-auto">
+              <p className="text-xs text-zinc-500 max-w-xs mx-auto mb-4">
                 We couldn't find verified companies matching your current filters or commute radius in Kolkata.
               </p>
+              <button
+                onClick={() => setIsAdminModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5 text-zinc-300" />
+                <span>Register New Kolkata Company</span>
+              </button>
             </div>
           ) : (
             filteredCompanies.map((company) => {
@@ -359,10 +368,13 @@ export const CompanyList: React.FC = () => {
 
       {/* Directory Footer */}
       <div className="p-3 border-t border-zinc-200/80 bg-zinc-50 text-[11px] text-zinc-500 flex items-center justify-between">
-        <span className="flex items-center gap-1">
-          <MapPin className="w-3 h-3 text-zinc-400" />
-          100% Verified Real Kolkata Jobs
-        </span>
+        <button
+          onClick={() => setIsAdminModalOpen(true)}
+          className="flex items-center gap-1 font-semibold text-zinc-700 hover:text-zinc-950 transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5 text-zinc-500" />
+          <span>+ Register New Kolkata Office</span>
+        </button>
         <span className="text-zinc-400">Sector V, New Town & CBD</span>
       </div>
 
