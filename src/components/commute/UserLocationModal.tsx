@@ -14,10 +14,13 @@ import {
   Bike, 
   Footprints,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Building2,
 } from 'lucide-react';
-import { PRESET_KOLKATA_LOCATIONS } from '@/utils/commute';
+import { PRESET_KOLKATA_LOCATIONS, ExtendedKolkataLocation } from '@/utils/commute';
 import { CommuteMode, UserLocation } from '@/types';
+
+type CategoryFilter = 'All' | 'Metro Hub' | 'IT / East' | 'South' | 'North' | 'Central' | 'South-West' | 'Howrah';
 
 export const UserLocationModal: React.FC = () => {
   const { 
@@ -31,16 +34,35 @@ export const UserLocationModal: React.FC = () => {
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All');
   const [isGettingGps, setIsGettingGps] = useState(false);
   const [gpsError, setGpsError] = useState('');
 
   if (!isLocationModalOpen) return null;
 
-  const filteredLocalities = PRESET_KOLKATA_LOCATIONS.filter(loc => 
-    loc.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const categories: { id: CategoryFilter; label: string }[] = [
+    { id: 'All', label: 'All Places' },
+    { id: 'Metro Hub', label: 'Metro & Railway' },
+    { id: 'IT / East', label: 'Salt Lake & New Town' },
+    { id: 'South', label: 'South Kolkata' },
+    { id: 'North', label: 'North Kolkata' },
+    { id: 'Central', label: 'Central Kolkata' },
+    { id: 'South-West', label: 'Behala & Alipore' },
+    { id: 'Howrah', label: 'Howrah & West Bank' },
+  ];
 
-  const handleSelectLocation = (loc: UserLocation) => {
+  const filteredLocalities = PRESET_KOLKATA_LOCATIONS.filter(loc => {
+    const matchesCategory = selectedCategory === 'All' || loc.category === selectedCategory;
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch = !query || 
+      loc.name.toLowerCase().includes(query) || 
+      (loc.landmark && loc.landmark.toLowerCase().includes(query)) ||
+      (loc.category && loc.category.toLowerCase().includes(query));
+    
+    return matchesCategory && matchesSearch;
+  });
+
+  const handleSelectLocation = (loc: ExtendedKolkataLocation) => {
     setUserLocation(loc);
     flyToLocation(loc.latitude, loc.longitude, 13);
     setIsLocationModalOpen(false);
@@ -85,10 +107,10 @@ export const UserLocationModal: React.FC = () => {
       />
 
       <div className="flex min-h-full items-center justify-center p-3 sm:p-4 text-center">
-        <div className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all border border-zinc-200 p-5 sm:p-6 space-y-5">
+        <div className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all border border-zinc-200 p-5 sm:p-6 space-y-4 max-h-[90vh] flex flex-col">
           
           {/* Header */}
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between flex-shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
                 <Navigation className="w-5 h-5 text-zinc-300" />
@@ -98,7 +120,7 @@ export const UserLocationModal: React.FC = () => {
                   Set Your Starting Location
                 </h3>
                 <p className="text-xs text-zinc-500">
-                  Calculate accurate commute times to tech offices across Kolkata
+                  Calculate accurate travel times and routes across Kolkata hubs
                 </p>
               </div>
             </div>
@@ -112,8 +134,8 @@ export const UserLocationModal: React.FC = () => {
           </div>
 
           {/* Commute Mode Selector */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-900 uppercase tracking-wider block">
+          <div className="space-y-1.5 flex-shrink-0">
+            <label className="text-[11px] font-semibold text-zinc-700 uppercase tracking-wider block">
               Preferred Travel Mode
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -126,25 +148,25 @@ export const UserLocationModal: React.FC = () => {
                 <button
                   key={mode}
                   onClick={() => setCommuteMode(mode)}
-                  className={`p-2.5 rounded-xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all ${
+                  className={`p-2 rounded-xl border text-center flex flex-col items-center justify-center gap-1 transition-all ${
                     commuteMode === mode
                       ? 'border-zinc-900 bg-zinc-900 text-white shadow-sm ring-1 ring-zinc-900'
                       : 'border-zinc-200 hover:border-zinc-300 bg-zinc-50/50 text-zinc-700 hover:bg-zinc-100'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${commuteMode === mode ? 'text-white' : 'text-zinc-600'}`} />
-                  <span className="text-[11px] font-semibold leading-tight">{label}</span>
+                  <Icon className={`w-3.5 h-3.5 ${commuteMode === mode ? 'text-white' : 'text-zinc-600'}`} />
+                  <span className="text-[10px] font-semibold leading-tight">{label}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* GPS Button */}
-          <div>
+          <div className="flex-shrink-0">
             <button
               onClick={handleUseCurrentLocation}
               disabled={isGettingGps}
-              className="w-full p-3 rounded-xl border border-zinc-300 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-2xs"
+              className="w-full p-2.5 rounded-xl border border-zinc-300 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-2xs"
             >
               <LocateFixed className={`w-4 h-4 text-zinc-800 ${isGettingGps ? 'animate-spin' : ''}`} />
               <span>{isGettingGps ? 'Locating via GPS...' : 'Use My Current Live Location'}</span>
@@ -155,21 +177,52 @@ export const UserLocationModal: React.FC = () => {
           </div>
 
           {/* Search Localities */}
-          <div className="space-y-2">
+          <div className="space-y-2 flex-shrink-0">
             <div className="relative">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Kolkata locality (e.g. Howrah, Garia, Dum Dum, Behala)..."
+                placeholder="Search 60+ Kolkata places (e.g. Howrah, Garia, Dum Dum, Victoria, Eco Park)..."
                 className="w-full pl-9 pr-3 py-2 bg-zinc-50 rounded-xl border border-zinc-200 text-xs focus:bg-white focus:outline-none focus:border-zinc-400"
               />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 text-xs"
+                >
+                  Clear
+                </button>
+              )}
             </div>
 
-            {/* Localities List */}
-            <div className="max-h-52 overflow-y-auto divide-y divide-zinc-100 border border-zinc-200 rounded-xl">
-              {filteredLocalities.map((loc) => {
+            {/* Region Filter Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-[11px]">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-2.5 py-1 rounded-lg whitespace-nowrap transition-colors font-medium ${
+                    selectedCategory === cat.id
+                      ? 'bg-zinc-900 text-white font-bold'
+                      : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Localities List */}
+          <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 border border-zinc-200 rounded-xl max-h-56">
+            {filteredLocalities.length === 0 ? (
+              <div className="p-6 text-center text-xs text-zinc-500">
+                No matching Kolkata locations found. Try searching for landmark, metro station, or area name.
+              </div>
+            ) : (
+              filteredLocalities.map((loc) => {
                 const isSelected = userLocation.name === loc.name;
 
                 return (
@@ -182,19 +235,42 @@ export const UserLocationModal: React.FC = () => {
                         : 'hover:bg-zinc-50 text-zinc-800'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-zinc-400'}`} />
-                      <span className="font-medium">{loc.name}</span>
+                    <div className="flex items-start gap-2.5 min-w-0 pr-2">
+                      <MapPin className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${isSelected ? 'text-white' : 'text-zinc-400'}`} />
+                      <div className="min-w-0">
+                        <div className="font-semibold leading-tight truncate">{loc.name}</div>
+                        {loc.landmark && (
+                          <div className={`text-[10px] mt-0.5 truncate ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
+                            {loc.landmark}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {isSelected && <Check className="w-4 h-4 text-white" />}
+
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {loc.category && (
+                        <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${
+                          isSelected ? 'bg-zinc-800 text-zinc-200' : 'bg-zinc-100 text-zinc-600'
+                        }`}>
+                          {loc.category}
+                        </span>
+                      )}
+                      {isSelected && <Check className="w-4 h-4 text-white" />}
+                    </div>
                   </button>
                 );
-              })}
-            </div>
+              })
+            )}
+          </div>
+
+          {/* Footer Note */}
+          <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1 flex-shrink-0">
+            <span>Showing {filteredLocalities.length} of {PRESET_KOLKATA_LOCATIONS.length} famous Kolkata places</span>
+            <span className="font-medium text-zinc-700">60+ Areas Available</span>
           </div>
 
           {/* Privacy Note */}
-          <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-200/80 text-[11px] text-zinc-500 flex items-start gap-2">
+          <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-200/80 text-[11px] text-zinc-500 flex items-start gap-2 flex-shrink-0">
             <ShieldCheck className="w-4 h-4 text-zinc-700 flex-shrink-0 mt-0.5" />
             <p>
               Your location is stored solely in your local browser storage to estimate travel distances. It is never broadcasted or shared publicly.
