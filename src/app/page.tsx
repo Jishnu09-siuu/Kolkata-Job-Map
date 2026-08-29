@@ -43,11 +43,12 @@ export default function Home() {
     setIsMobileListOpen,
     filteredCompanies,
     setIsLocationModalOpen,
-    setIsNotificationsDrawerOpen
+    isCompanyDrawerOpen,
+    setIsCompanyDrawerOpen
   } = useApp();
 
   return (
-    <main className="flex flex-col h-screen w-screen overflow-hidden bg-[#FAFAFA]">
+    <main className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-[#FAFAFA]">
       
       {/* Top Sticky Header */}
       <Header
@@ -65,14 +66,14 @@ export default function Home() {
             fixed md:relative inset-y-0 left-0 z-30 md:z-20
             w-full sm:w-[380px] lg:w-[420px] h-full
             transition-transform duration-300 ease-in-out
-            bg-white shadow-xl md:shadow-none
+            bg-white shadow-2xl md:shadow-none
           `}
         >
           {/* Mobile close button inside sidebar */}
-          <div className="md:hidden p-2 bg-zinc-900 text-white flex items-center justify-between">
+          <div className="md:hidden p-3 bg-zinc-900 text-white flex items-center justify-between flex-shrink-0">
             <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
               <Building2 className="w-4 h-4 text-zinc-300" />
-              <span>Kolkata Companies ({filteredCompanies.length})</span>
+              <span>Kolkata Directory ({filteredCompanies.length})</span>
             </span>
             <button
               onClick={() => setIsMobileListOpen(false)}
@@ -82,14 +83,24 @@ export default function Home() {
             </button>
           </div>
 
-          <CompanyList />
+          <div className="flex-1 h-[calc(100%-48px)] md:h-full overflow-hidden">
+            <CompanyList />
+          </div>
         </aside>
 
-        {/* Backdrop for mobile drawer */}
+        {/* Backdrop for mobile directory drawer */}
         {isMobileListOpen && (
           <div 
             onClick={() => setIsMobileListOpen(false)}
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs z-20 md:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs z-20 md:hidden transition-opacity"
+          />
+        )}
+
+        {/* Backdrop for mobile company detail drawer */}
+        {isCompanyDrawerOpen && (
+          <div 
+            onClick={() => setIsCompanyDrawerOpen(false)}
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs z-35 md:hidden transition-opacity"
           />
         )}
 
@@ -97,25 +108,25 @@ export default function Home() {
         <section className="flex-1 h-full w-full relative">
           <DynamicKolkataMap />
 
-          {/* Mobile View Toggles Floating on Bottom */}
-          <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-zinc-950 text-white px-3 py-2 rounded-full shadow-2xl border border-zinc-800">
+          {/* Mobile View Floating Bottom Action Bar */}
+          <div className="md:hidden absolute bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-zinc-950/95 backdrop-blur-md text-white p-1.5 rounded-full shadow-2xl border border-zinc-800 max-w-[94vw]">
             <button
               onClick={() => setIsMobileListOpen(!isMobileListOpen)}
-              className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors"
+              className="flex items-center gap-1 text-xs font-semibold px-3 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all whitespace-nowrap"
             >
               <Building2 className="w-3.5 h-3.5 text-zinc-300" />
-              <span>{filteredCompanies.length} Companies</span>
+              <span>{filteredCompanies.length} Roles</span>
             </button>
             <button
               onClick={() => setIsLocationModalOpen(true)}
-              className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors"
+              className="flex items-center gap-1 text-xs font-semibold px-2.5 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all whitespace-nowrap"
             >
               <MapPin className="w-3.5 h-3.5 text-zinc-300" />
-              <span>Location</span>
+              <span>Locality</span>
             </button>
             <button
               onClick={() => setIsFilterDrawerOpen(true)}
-              className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors"
+              className="flex items-center gap-1 text-xs font-semibold px-2.5 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all whitespace-nowrap"
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-300" />
               <span>Filters</span>

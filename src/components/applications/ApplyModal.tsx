@@ -119,7 +119,7 @@ export const ApplyModal: React.FC = () => {
       />
 
       <div className="flex min-h-full items-center justify-center p-3 sm:p-4 text-center">
-        <div className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all border border-zinc-200 flex flex-col max-h-[92vh]">
+        <div className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all border border-zinc-200 flex flex-col max-h-[92dvh]">
           
           {/* Modal Header */}
           <div className="p-4 sm:p-5 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between">
