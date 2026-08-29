@@ -52,7 +52,32 @@ export function getCompanyRecruiterEmail(companyName: string): string {
   return `talent.kolkata@${domain}`;
 }
 
+export function escapeHtml(str: string | undefined | null): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPayload) {
+  const safeName = escapeHtml(payload.applicantName);
+  const safeEmail = escapeHtml(payload.applicantEmail);
+  const safePhone = escapeHtml(payload.applicantPhone);
+  const safeTitle = escapeHtml(payload.jobTitle);
+  const safeCompany = escapeHtml(payload.companyName);
+  const safeLocation = escapeHtml(payload.jobLocationArea);
+  const safeExp = escapeHtml(payload.experienceLevel);
+  const safeSalary = escapeHtml(payload.expectedSalary);
+  const safeCover = escapeHtml(payload.coverNote);
+  const safeResume = escapeHtml(payload.resumeFileName);
+  const safeLinkedIn = escapeHtml(payload.applicantLinkedIn);
+  const safeGitHub = escapeHtml(payload.applicantGitHub);
+  const safePortfolio = escapeHtml(payload.applicantPortfolio);
+  const safeTracking = escapeHtml(payload.trackingCode);
+
   const recruiterEmail = process.env.RECRUITER_OVERRIDE_EMAIL || getCompanyRecruiterEmail(payload.companyName);
   const fromEmail = process.env.SMTP_FROM || 'no-reply@kolkatajobmap.in';
 
@@ -90,7 +115,7 @@ export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPay
           <div class="header">
             <div class="badge">Kolkata Direct Talent Submission</div>
             <h1 class="title">New Candidate Application</h1>
-            <p class="subtitle">Position: ${payload.jobTitle} / Location: ${payload.jobLocationArea}</p>
+            <p class="subtitle">Position: ${safeTitle} / Location: ${safeLocation}</p>
           </div>
 
           <div class="content">
@@ -98,19 +123,19 @@ export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPay
             <table class="info-table">
               <tr>
                 <td class="label">Tracking Code:</td>
-                <td class="value"><span style="font-family: monospace; background: #f4f4f5; padding: 2px 6px; border-radius: 4px;">${payload.trackingCode}</span></td>
+                <td class="value"><span style="font-family: monospace; background: #f4f4f5; padding: 2px 6px; border-radius: 4px;">${safeTracking}</span></td>
               </tr>
               <tr>
                 <td class="label">Target Employer:</td>
-                <td class="value">${payload.companyName}</td>
+                <td class="value">${safeCompany}</td>
               </tr>
               <tr>
                 <td class="label">Role Title:</td>
-                <td class="value">${payload.jobTitle}</td>
+                <td class="value">${safeTitle}</td>
               </tr>
               <tr>
                 <td class="label">Location / Hub:</td>
-                <td class="value">${payload.jobLocationArea}</td>
+                <td class="value">${safeLocation}</td>
               </tr>
             </table>
 
@@ -118,44 +143,44 @@ export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPay
             <table class="info-table">
               <tr>
                 <td class="label">Full Name:</td>
-                <td class="value">${payload.applicantName}</td>
+                <td class="value">${safeName}</td>
               </tr>
               <tr>
                 <td class="label">Email Address:</td>
-                <td class="value"><a href="mailto:${payload.applicantEmail}">${payload.applicantEmail}</a></td>
+                <td class="value"><a href="mailto:${safeEmail}">${safeEmail}</a></td>
               </tr>
               ${payload.applicantPhone ? `
               <tr>
                 <td class="label">Phone / WhatsApp:</td>
-                <td class="value">${payload.applicantPhone}</td>
+                <td class="value">${safePhone}</td>
               </tr>
               ` : ''}
               <tr>
                 <td class="label">Experience Level:</td>
-                <td class="value">${payload.experienceLevel}</td>
+                <td class="value">${safeExp}</td>
               </tr>
               ${payload.expectedSalary ? `
               <tr>
                 <td class="label">Expected CTC:</td>
-                <td class="value">${payload.expectedSalary}</td>
+                <td class="value">${safeSalary}</td>
               </tr>
               ` : ''}
               ${payload.applicantLinkedIn ? `
               <tr>
                 <td class="label">LinkedIn Profile:</td>
-                <td class="value"><a href="${payload.applicantLinkedIn}" target="_blank">${payload.applicantLinkedIn}</a></td>
+                <td class="value"><a href="${safeLinkedIn}" target="_blank">${safeLinkedIn}</a></td>
               </tr>
               ` : ''}
               ${payload.applicantGitHub ? `
               <tr>
                 <td class="label">GitHub Profile:</td>
-                <td class="value"><a href="${payload.applicantGitHub}" target="_blank">${payload.applicantGitHub}</a></td>
+                <td class="value"><a href="${safeGitHub}" target="_blank">${safeGitHub}</a></td>
               </tr>
               ` : ''}
               ${payload.applicantPortfolio ? `
               <tr>
                 <td class="label">Portfolio Website:</td>
-                <td class="value"><a href="${payload.applicantPortfolio}" target="_blank">${payload.applicantPortfolio}</a></td>
+                <td class="value"><a href="${safePortfolio}" target="_blank">${safePortfolio}</a></td>
               </tr>
               ` : ''}
             </table>
@@ -163,17 +188,17 @@ export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPay
             ${payload.coverNote ? `
               <div class="section-title">Candidate Note / Cover Summary</div>
               <div class="note-box">
-                ${payload.coverNote.replace(/\n/g, '<br/>')}
+                ${safeCover.replace(/\n/g, '<br/>')}
               </div>
             ` : ''}
 
             ${payload.resumeFileName ? `
               <div class="section-title">Attached Resume</div>
-              <p style="font-size: 12px; margin: 4px 0;">Attached File: <strong>${payload.resumeFileName}</strong></p>
+              <p style="font-size: 12px; margin: 4px 0;">Attached File: <strong>${safeResume}</strong></p>
             ` : ''}
 
             <div style="text-align: center; margin-top: 24px;">
-              <a href="mailto:${payload.applicantEmail}?subject=Regarding%20your%20application%20for%20${encodeURIComponent(payload.jobTitle)}%20at%20${encodeURIComponent(payload.companyName)}%20[${payload.trackingCode}]" class="btn">
+              <a href="mailto:${safeEmail}?subject=Regarding%20your%20application%20for%20${encodeURIComponent(payload.jobTitle)}%20at%20${encodeURIComponent(payload.companyName)}%20[${safeTracking}]" class="btn">
                 Contact Candidate Directly
               </a>
             </div>
@@ -181,7 +206,7 @@ export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPay
 
           <div class="footer">
             Delivered securely via Kolkata Job Map Direct Talent Routing Protocol.<br/>
-            Target Inbox: ${recruiterEmail} &bull; Timestamp: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+            Target Inbox: ${escapeHtml(recruiterEmail)} &bull; Timestamp: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
           </div>
         </div>
       </body>
@@ -195,11 +220,11 @@ export async function sendRecruiterApplicationEmail(payload: ApplicationEmailPay
       <body style="font-family: sans-serif; color: #18181b; background: #f4f4f5; padding: 20px;">
         <div style="max-width: 550px; margin: 0 auto; background: #fff; border-radius: 12px; border: 1px solid #e4e4e7; padding: 24px;">
           <h2 style="margin-top: 0;">Application Transmitted Successfully</h2>
-          <p style="font-size: 13px; color: #52525b;">Your application for <strong>${payload.jobTitle}</strong> has been transmitted directly to <strong>${payload.companyName}</strong> recruitment team.</p>
+          <p style="font-size: 13px; color: #52525b;">Your application for <strong>${safeTitle}</strong> has been transmitted directly to <strong>${safeCompany}</strong> recruitment team.</p>
           <div style="background: #f4f4f5; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 14px; font-weight: bold; margin: 16px 0;">
-            Tracking Reference: ${payload.trackingCode}
+            Tracking Reference: ${safeTracking}
           </div>
-          <p style="font-size: 12px; color: #71717a;">The hiring manager will review your submission and contact you directly via ${payload.applicantEmail}.</p>
+          <p style="font-size: 12px; color: #71717a;">The hiring manager will review your submission and contact you directly via ${safeEmail}.</p>
           <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 20px 0;"/>
           <p style="font-size: 11px; color: #a1a1aa; margin: 0;">Kolkata Job Map &bull; Direct Geospatial Job Routing</p>
         </div>
