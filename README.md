@@ -1,4 +1,4 @@
-# 📍 Kolkata Job Map (কলকাতা জব ম্যাপ)
+# 📍 Kolkata Job Map 
 
 > **The definitive geospatial job discovery and verified IT office directory for Greater Kolkata.**  
 > Explore real office buildings, tech parks, active openings, fresher-friendly drives, and commute times across Salt Lake Sector V, New Town, Park Street, Kasba, and Bantala SEZ.
